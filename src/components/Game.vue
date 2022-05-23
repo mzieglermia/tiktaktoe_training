@@ -4,16 +4,18 @@
       <Board :squares="squares" :marked="marked" @click="handleClick" />
     </div>
     <div class="game-info">
+      <Info :game="game" @clickJump="jumpTo" /> 
+      <!--
       <div v-if="winner == null && draw == false" class="status">
         Next player: {{ xIsNext ? "X" : "O" }}
       </div>
       <div v-else-if="draw == false" class="status">Winner: {{ winner }}</div>
-      <div v-else class="status">Draw!</div> <!-- 5. -->
+      <div v-else class="status">Draw!</div>
       <ol>
         <li v-for="(squares, i) of history" :key="i">
           <button @click="jumpTo(i)">Go to move {{ i }} ({{history[i].latestChange[0]+1}},{{history[i].latestChange[1]+1}})</button>
         </li>
-      </ol>
+      </ol> -->
     </div>
   </div>
 </template>
@@ -22,12 +24,13 @@ import Vue from "vue";
 import Component from "vue-class-component";
 
 import Board from "./Board.vue";
+import Info from "./Info.vue"
 
 @Component({
-  components: { Board },
+  components: { Board, Info },
 })
 export default class Game extends Vue {
-  history: stateData[] = [{squares: Array(9).fill(null), latestChange: []}];
+  history: boardData[] = [{squares: Array(9).fill(null), latestChange: []}];
 
   //
   marked: (boolean)[] = Array(9).fill(false); //4.
@@ -41,14 +44,21 @@ export default class Game extends Vue {
     else{
       return Array(9).fill(null);
     }
+  } 
+
+  jumpTo(i: number) {
+    this.stepNumber = i;
+    for(let i = 0; i<9; i++){
+      this.marked[i] = false;
+    }
+  }
+
+  get game(): gameState{
+    return {winner: this.winner, draw: this.draw, xIsNext:this.xIsNext, history:this.history}
   }
 
   get xIsNext(): boolean {
     return this.stepNumber % 2 === 0;
-  }
-
-  jumpTo(i: number) {
-    this.stepNumber = i;
   }
 
   get winner() {
@@ -94,6 +104,7 @@ export default class Game extends Vue {
   }
 
   handleClick(i: number) {
+
     if (this.winner != null) return;
 
     let squares = this.squares.slice();
@@ -108,8 +119,16 @@ export default class Game extends Vue {
 
 
 }
-interface stateData {
+interface boardData {
     squares: ('X' | 'O' | null)[];
     latestChange: (number)[]; // 0. -> x, 1. -> y
 }
+
+interface gameState {
+  history: boardData[];
+  winner: ('X' | 'O' | null);
+  xIsNext: boolean;
+  draw: boolean;
+}
+
 </script>
