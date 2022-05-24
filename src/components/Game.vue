@@ -54,7 +54,7 @@ export default class Game extends Vue {
   }
 
   get game(): gameState{
-    return {winner: this.winner, draw: this.draw, xIsNext:this.xIsNext, history:this.history}
+    return {winner: this.winner, draw: this.draw, xIsNext:this.xIsNext, history:this.history, stepNumber:this.stepNumber}
   }
 
   get xIsNext(): boolean {
@@ -129,6 +129,7 @@ interface gameState {
   winner: ('X' | 'O' | null);
   xIsNext: boolean;
   draw: boolean;
+  stepNumber: number;
 }
 
 </script>

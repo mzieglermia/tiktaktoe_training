@@ -12,7 +12,7 @@
 
     <ol>
       <li v-for="(squares, i) of game.history" :key="i">
-        <button @click="$emit('clickJump',i)">Go to move {{ i }} ({{game.history[i].latestChange[0]+1}},{{game.history[i].latestChange[1]+1}})</button>
+        <button @click="$emit('clickJump',i)" :class="`listbutton ${isBold(i)}`">Go to move {{ i }} ({{game.history[i].latestChange[0]+1}},{{game.history[i].latestChange[1]+1}})</button>
       </li>
     </ol>
   </div>
@@ -30,5 +30,10 @@ import { Prop } from "vue-property-decorator";
 @Component({})
 export default class Info extends Vue {
   @Prop({}) game: gameState;
+
+  isBold(i:number): boolean{
+    if(i==this.game.stepNumber) return true;
+    else return false;
+  }
 }
 </script>
