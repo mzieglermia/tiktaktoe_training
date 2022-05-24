@@ -9,10 +9,13 @@
     <div v-else class="status">
       Draw! <!-- 5. -->
     </div> 
-
+    <button @click="reverse()">Reverse the list</button>
     <ol>
-      <li v-for="(squares, i) of game.history" :key="i">
-        <button @click="$emit('clickJump',i)" :class="`listbutton ${isBold(i)}`">Go to move {{ i }} ({{game.history[i].latestChange[0]+1}},{{game.history[i].latestChange[1]+1}})</button>
+      <li v-for="(squares, i) of historySorted" :key="i">
+        <button @click="$emit('clickJump',historySorted[i].stepNumber)" 
+        :class="`listbutton ${isBold(historySorted[i].stepNumber)}`">
+          Go to move {{ historySorted[i].stepNumber }} ({{historySorted[i].latestChange[0]+1}},{{historySorted[i].latestChange[1]+1}})
+        </button>
       </li>
     </ol>
   </div>
@@ -30,10 +33,24 @@ import { Prop } from "vue-property-decorator";
 @Component({})
 export default class Info extends Vue {
   @Prop({}) game: gameState;
+  //indicates whether the list is reversed or not.
+  reversed: boolean = false;
 
+  //bolds the current selected board state in the info box.
   isBold(i:number): boolean{
-    if(i==this.game.stepNumber) return true;
+    if(i==this.game.currentStepNumber)
+    {
+      return true;
+    }
     else return false;
+  }
+  reverse(){
+    this.reversed=!this.reversed;
+  }
+  //returns reversed history if button is pressed.
+  get historySorted(){
+    if(this.reversed) return [...this.game.history].reverse();
+    else return this.game.history;
   }
 }
 </script>

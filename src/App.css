@@ -4,13 +4,8 @@ body {
 }
 
 ol, ul {
-  padding-left: 30px;
+  padding-left: 10px;
   list-style-type: none;
-}
-
-.sideways{
-  padding-left: 0px;
-  display: inline-flex;
 }
 
 .board-row:after {

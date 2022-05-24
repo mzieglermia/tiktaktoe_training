@@ -4,18 +4,7 @@
       <Board :squares="squares" :marked="marked" @click="handleClick" />
     </div>
     <div class="game-info">
-      <Info :game="game" @clickJump="jumpTo" /> 
-      <!--
-      <div v-if="winner == null && draw == false" class="status">
-        Next player: {{ xIsNext ? "X" : "O" }}
-      </div>
-      <div v-else-if="draw == false" class="status">Winner: {{ winner }}</div>
-      <div v-else class="status">Draw!</div>
-      <ol>
-        <li v-for="(squares, i) of history" :key="i">
-          <button @click="jumpTo(i)">Go to move {{ i }} ({{history[i].latestChange[0]+1}},{{history[i].latestChange[1]+1}})</button>
-        </li>
-      </ol> -->
+      <Info :game="game" @clickJump="jumpTo" />
     </div>
   </div>
 </template>
@@ -30,9 +19,10 @@ import Info from "./Info.vue"
   components: { Board, Info },
 })
 export default class Game extends Vue {
-  history: boardData[] = [{squares: Array(9).fill(null), latestChange: []}];
+  //-1, -1 so it shows 0,0 as first latestChange.
+  history: boardData[] = [{squares: Array(9).fill(null), latestChange: [-1,-1], stepNumber:0}];
 
-  //
+  //saves which squares are marked.
   marked: (boolean)[] = Array(9).fill(false); //4.
 
   stepNumber: number = 0;
@@ -54,7 +44,7 @@ export default class Game extends Vue {
   }
 
   get game(): gameState{
-    return {winner: this.winner, draw: this.draw, xIsNext:this.xIsNext, history:this.history, stepNumber:this.stepNumber}
+    return {winner: this.winner, draw: this.draw, xIsNext:this.xIsNext, history:this.history, currentStepNumber:this.stepNumber}
   }
 
   get xIsNext(): boolean {
@@ -89,6 +79,7 @@ export default class Game extends Vue {
     return null;
   }
 
+  //returns true if winner is null and if it's the last step.
   get draw(){ //5.
     if(this.stepNumber==9){ 
       return true;
@@ -108,28 +99,30 @@ export default class Game extends Vue {
     if (this.winner != null) return;
 
     let squares = this.squares.slice();
-    //1. returns if you try to override square
+    //1. returns if you try to override square.
     if(squares[i] != null) return;
     squares[i] = this.xIsNext ? "X" : "O";
     this.history = this.history.slice(0,this.stepNumber + 1);
-    let state = {squares: squares, latestChange: this.getColumAndRow(i) };
+    let state = {squares: squares, latestChange: this.getColumAndRow(i),stepNumber:this.stepNumber+1 };
     this.history.push(state);
     this.stepNumber++;
   }
 
 
 }
+//interface for the different board states
 interface boardData {
     squares: ('X' | 'O' | null)[];
-    latestChange: (number)[]; // 0. -> x, 1. -> y
+    latestChange: (number)[]; // [0]-> x, [1]-> y; grid starts with 0/0 in the upper left corner.
+    stepNumber: (number); //indicates stepNumber at this state.
 }
-
+//interface to save the gameState as a whole.
 interface gameState {
   history: boardData[];
   winner: ('X' | 'O' | null);
   xIsNext: boolean;
   draw: boolean;
-  stepNumber: number;
+  currentStepNumber: number; //the stepNumber the board is currently displaying.
 }
 
 </script>
